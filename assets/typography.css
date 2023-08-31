@@ -1,0 +1,60 @@
+
+.dash-dropdown{
+    margin-left: 10%;
+    margin-right: 10%;
+}
+
+.card{
+    height: 120px;
+}
+
+#course-name{
+    font-size: 12px;
+}
+
+#skill-details{
+    font-size: 12px;
+    overflow-y: scroll;
+    height: 40px;
+}
+
+#first-card-body{
+    width: 100%;
+}
+
+.col-5{
+    width: 300px;
+}
+
+#col-skill-selector{
+    width: 20%;
+}
+
+#col-skill-trend-plot{
+    width: 40%;
+}
+
+#col-left-panel{
+    width: 20%;
+    margin-left: 10%;
+}
+
+#skill-trend-plot{
+    height: 360px;
+}
+
+.footer-paragraph{
+    margin-left: 10px;
+    height: 10px;
+}
+
+#footer{
+    padding-top: 10px;
+    padding-left: 0px;
+    margin-top: 50px;
+    margin-left: 10%;
+    margin-right: 10%;
+    height: 100px;
+    background-color: #003057;
+    color: white;
+}
