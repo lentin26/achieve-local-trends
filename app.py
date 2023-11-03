@@ -13,6 +13,9 @@ certprep_skills = pd.read_csv('data/certprep-skus-extracted-skills-and-demand.cs
 certprep_data = pd.read_csv('data/cert-prep-catalog-extracted-skills-agg-clean.csv')
 certprep_skill_demand = pd.read_csv('data/certprep-skill-demand.csv')
 skills = certprep_skills[['id', 'name', 'description']].drop_duplicates()
+course_badge = pd.read_excel('data/certprep-credly-fuzzy-match-approved-results.xlsx', usecols=['CerPrep Course', 'Maria Lentini'])\
+    .rename(columns={'CerPrep Course': 'CertPrep Course', 'Maria Lentini': 'Credly Badge'})\
+    .replace('Ambiguous', np.nan)
 
 # https://dashaggrid.pythonanywhere.com/components/markdown
 rain =  "![alt text: rain](https://www.ag-grid.com/example-assets/weather/rain.png)"
@@ -106,7 +109,14 @@ app.layout = html.Div([
                         mk_card(
                             header="CertPrep Course", 
                             id="course-name", 
-                            value="Hey"
+                            value="Meow"
+                        )
+                    ]),
+                    dbc.Row([
+                        mk_card(
+                            header="Credly Badge", 
+                            id="credly-badge", 
+                            value="Meow"
                         )
                     ]),
                     dbc.Row([
@@ -123,13 +133,6 @@ app.layout = html.Div([
                             value="Meow"
                         )
                     ]),
-                    dbc.Row([
-                        mk_card(
-                            header="Avg. YoY Skill Demand", 
-                            id="avg-yoy-skill-demand", 
-                            value="Meow"
-                        )
-                    ])
                 ], id='col-left-panel', width=5),
                 dbc.Col([
                     dbc.Row([
@@ -182,7 +185,7 @@ def update_dash(course_name):
     [Output(component_id='selection-multiple-skills', component_property='rowData'),
     Output(component_id='no-skills', component_property='children'),
     Output(component_id='no-in-demend-skills', component_property='children'),
-    Output(component_id='avg-yoy-skill-demand', component_property='children')],
+    Output(component_id='credly-badge', component_property='children')],
     [Input(component_id='course-dropdown', component_property='value')]
 )
 def update_skills_multi_selector(course_name):
@@ -193,21 +196,14 @@ def update_skills_multi_selector(course_name):
         ].iloc[0]
         # filter data using sku associated wit course name
         data = certprep_skills.loc[certprep_skills.sku == sku, :]
-        # get and formand avg yoy demand
-        avg_yoy_demand = data.skill_changes_1y.mean()
-        # format with '+' or '-' depending on sign
-        if avg_yoy_demand >= 0:
-            avg_yoy_demand = '+' + str(round(100 * avg_yoy_demand, 1)) + '%'
-        else:
-            avg_yoy_demand = str(round(100 * avg_yoy_demand, 1)) + '%'
-        
+
+        course_name_clean = course_name.replace("CertPREP Courseware: ", "").strip()\
+            .replace(' - Self-Paced', '')\
+            .replace(' - Instructor-Led', '')
+        credly_badge = course_badge[course_badge['CertPrep Course'] == course_name_clean].iloc[0]
         data['YoY (%)'] = (100 * data['skill_changes_1y']).round(1).astype(str)
-        # # add images to in-demand column
-        # xs = data.to_dict('records')
-        # for x in xs:
-        #     x["In-Demand"] = f"{rain}"
-        # return skill sclector table and number of skills
-        return data.to_dict("records"), data.id.nunique(), data.in_demand.sum(), avg_yoy_demand
+
+        return data.to_dict("records"), data.id.nunique(), data.in_demand.sum(), credly_badge
 
 @callback(
     [Output(component_id='skill-trend-plot', component_property='figure'),
